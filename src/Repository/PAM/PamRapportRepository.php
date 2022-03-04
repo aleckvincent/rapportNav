@@ -2,9 +2,13 @@
 
 namespace App\Repository\PAM;
 
+use App\Entity\PAM\PamDraft;
 use App\Entity\PAM\PamIndicateur;
 use App\Entity\PAM\PamRapport;
 use App\Entity\Service;
+use App\Exception\RapportNotFound;
+use App\Exception\ServiceNotFound;
+use App\Repository\PAM\Utils\RapportRepositoryUtils;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -18,12 +22,21 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class PamRapportRepository extends ServiceEntityRepository
 {
 
+    /**
+     * @var TokenStorageInterface
+     */
     protected $tokenStorage;
 
-    public function __construct(ManagerRegistry $registry, TokenStorageInterface $tokenStorage)
+    /**
+     * @var RapportRepositoryUtils
+     */
+    protected $utils;
+
+    public function __construct(ManagerRegistry $registry, TokenStorageInterface $tokenStorage, RapportRepositoryUtils $utils)
     {
         parent::__construct($registry, PamRapport::class);
         $this->tokenStorage = $tokenStorage;
+        $this->utils = $utils;
     }
 
     /**
@@ -60,5 +73,18 @@ class PamRapportRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param string|null $periode
+     * @param string|null $serviceName
+     *
+     * @return PamDraft[]
+     * @throws \Exception
+     */
+    public function filter(?string $periode, ?string $serviceName): array
+    {
+        $qb = $this->createQueryBuilder('pam_d');
+        return $this->utils->handleRequestFiltre($qb, $periode, $serviceName)->getQuery()->getResult();
     }
 }

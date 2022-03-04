@@ -5,6 +5,9 @@ namespace App\Repository\PAM;
 use App\Entity\PAM\PamDraft;
 use App\Entity\PAM\PamIndicateur;
 use App\Entity\PAM\PamRapport;
+use App\Entity\Service;
+use App\Exception\ServiceNotFound;
+use App\Repository\PAM\Utils\RapportRepositoryUtils;
 use App\Request\PAM\DraftRequest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -21,14 +24,26 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class PamDraftRepository extends ServiceEntityRepository
 {
+    /**
+     * @var SerializerInterface
+     */
     protected $serializer;
 
+    /**
+     * @var TokenStorageInterface
+     */
     protected $tokenStorage;
 
-    public function __construct(ManagerRegistry $registry, SerializerInterface $serializer, TokenStorageInterface $tokenStorage)
+    /**
+     * @var RapportRepositoryUtils
+     */
+    protected $utils;
+
+    public function __construct(ManagerRegistry $registry, SerializerInterface $serializer, TokenStorageInterface $tokenStorage, RapportRepositoryUtils $utils)
     {
         $this->serializer = $serializer;
         $this->tokenStorage = $tokenStorage;
+        $this->utils = $utils;
         parent::__construct($registry, PamDraft::class);
     }
 
@@ -96,5 +111,18 @@ class PamDraftRepository extends ServiceEntityRepository
         }
 
         return $rapports;
+    }
+
+    /**
+     * @param string|null $periode
+     * @param string|null $serviceName
+     *
+     * @return PamDraft[]
+     * @throws ServiceNotFound
+     */
+    public function filter(?string $periode, ?string $serviceName): array
+    {
+        $qb = $this->createQueryBuilder('pam_d');
+        return $this->utils->handleRequestFiltre($qb, $periode, $serviceName)->getQuery()->getResult();
     }
 }

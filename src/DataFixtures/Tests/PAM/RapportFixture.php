@@ -31,27 +31,39 @@ class RapportFixture extends Fixture implements FixtureGroupInterface, OrderedFi
     {
         $fonction = new FonctionAgent();
         $fonctionParticuliere = new FonctionParticuliereAgent();
-
         $fonction->setNom('Commandant');
         $fonctionParticuliere->setNom('Chef');
-
         $manager->persist($fonction);
         $manager->persist($fonctionParticuliere);
 
-        for($i = 0; $i <= 2; $i++) {
-            $this->createRapport($manager, $i+1, $i+1, $fonction, $fonctionParticuliere);
-        }
+        $startYear2020 = new \DateTimeImmutable('2020-04-02');
+        $endYear2020 = $startYear2020->add(new \DateInterval('P20D'));
 
+        $startYear2021_first = new \DateTimeImmutable('2021-05-03');
+        $endYear2021_first = $startYear2021_first->add(new \DateInterval('P20D'));
+
+        $startYear2021_second = new \DateTimeImmutable('2021-08-03');
+        $endYear2021_second = $startYear2021_second->add(new \DateInterval('P20D'));
+
+        $startFiveMonthsAgo = new \DateTimeImmutable("-5 months");
+        $endFiveMonthsAgo = $startFiveMonthsAgo->add(new \DateInterval('P20D'));
+
+        $this->createRapport($manager, $startYear2020, $endYear2020, $fonction, $fonctionParticuliere, 1);
+        $this->createRapport($manager, $startYear2021_first, $endYear2021_first, $fonction, $fonctionParticuliere, 1);
+        $this->createRapport($manager, $startYear2021_second, $endYear2021_second, $fonction, $fonctionParticuliere, 2);
+        $this->createRapport($manager, $startFiveMonthsAgo, $endFiveMonthsAgo, $fonction, $fonctionParticuliere, 3);
     }
 
-    private function createRapport(ObjectManager $manager, int $keyID, int $month, $fonction, $fonctionParticuliere)
+    private function createRapport(ObjectManager $manager, \DateTimeImmutable $startDateTime,
+                                   \DateTimeImmutable $endDateTime, FonctionAgent $fonction,
+                                   FonctionParticuliereAgent $fonctionParticuliere, int $keyID)
     {
-        $currentYear = new \DateTime();
-        $service = new Service();
-
-        $service->setNom('PAM_test');
-
-        $manager->persist($service);
+        $service = $manager->getRepository(Service::class)->findOneBy(['nom' => 'PAM_test']);
+        if(!$service) {
+            $service = new Service();
+            $service->setNom('PAM_test');
+            $manager->persist($service);
+        }
 
         $rapport = new PamRapport();
 
@@ -68,8 +80,8 @@ class RapportFixture extends Fixture implements FixtureGroupInterface, OrderedFi
             ->setMouillage(41)
             ->setMeteo(41)
             ->setMaintenance(41)
-            ->setStartDatetime(new \DateTimeImmutable($month . '/01/' . $currentYear->format('Y')))
-            ->setEndDatetime(new \DateTimeImmutable($month . '/25/' . $currentYear->format('Y')));
+            ->setStartDatetime($startDateTime)
+            ->setEndDatetime($endDateTime);
 
         $catControles = $manager->getRepository(CategoryPamControle::class)->findAll();
         $catIndicateurs = $manager->getRepository(CategoryPamIndicateur::class)->findAll();
@@ -99,7 +111,7 @@ class RapportFixture extends Fixture implements FixtureGroupInterface, OrderedFi
         $agent = new Agent();
         $agent->setNom('Colas')
             ->setPrenom('Robert')
-            ->setDateArrivee(new \DateTimeImmutable('2020-01-01'));
+            ->setDateArrivee($startDateTime);
 
         $membre = new PamEquipageAgent();
 
@@ -115,7 +127,7 @@ class RapportFixture extends Fixture implements FixtureGroupInterface, OrderedFi
 
 
 
-        $rapport->setId('MED-' . $currentYear->format('Y') . '-' . $keyID);
+        $rapport->setId('MED-' . $startDateTime->format('Y') . '-' . $keyID);
         $rapport->setCreatedBy($service);
 
         $rapportID = new PamRapportId();

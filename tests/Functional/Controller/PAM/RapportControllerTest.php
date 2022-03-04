@@ -77,13 +77,12 @@ class RapportControllerTest extends WebTestCase {
 
     public function testRapportUpdateInformationsGeneralesSuccess()
     {
-        $currentYear = new \DateTime();
         $container = self::$container;
 
-        $id = 'MED-' . $currentYear->format('Y') . '-1';
+        $id = 'MED-2021-1';
 
         $json = $this->jsonReader('body-test-rapport-update-informationsGenerales-success.json');
-        $this->sendRequest('/rapport/' . $id, $json, 'PUT');
+        $this->sendRequest('/rapport/MED-2021-1', $json, 'PUT');
 
 
         /** @var PamRapport $updatedRapport */
@@ -97,13 +96,12 @@ class RapportControllerTest extends WebTestCase {
 
     public function testRapportUpdateControlesSuccess()
     {
-        $currentYear = new \DateTime();
         $container = self::$container;
 
-        $id = 'MED-' . $currentYear->format('Y') . '-1';
+        $id = 'MED-2021-1';
 
         $json = $this->jsonReader('body-test-rapport-update-controles-success.json');
-        $this->sendRequest('/rapport/' . $id, $json, 'PUT');
+        $this->sendRequest('/rapport/MED-2021-1', $json, 'PUT');
 
         /** @var PamRapport $updatedRapport */
         $updatedRapport = $container->get(PamRapportRepository::class)->find($id);
@@ -118,13 +116,12 @@ class RapportControllerTest extends WebTestCase {
 
     public function testRapportUpdateMissionsSuccess()
     {
-        $currentYear = new \DateTime();
         $container = self::$container;
 
-        $id = 'MED-' . $currentYear->format('Y') . '-1';
+        $id = 'MED-2021-1';
 
         $json = $this->jsonReader('body-test-rapport-update-missions-success.json');
-        $this->sendRequest('/rapport/' . $id, $json, 'PUT');
+        $this->sendRequest('/rapport/MED-2021-1', $json, 'PUT');
 
         /** @var PamRapport $updatedRapport */
         $updatedRapport = $container->get(PamRapportRepository::class)->find($id);
@@ -143,16 +140,13 @@ class RapportControllerTest extends WebTestCase {
         $this->sendRequest('/rapport', null, 'GET');
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-
-        $this->assertCount(4, $response);
+        $this->assertCount(6, $response);
         $this->assertResponseStatusCodeSame(200);
         $this->assertNotNull($response[0]['id']);
         $this->assertNotNull($response[1]['id']);
 
-
-
         $this->assertEquals('validé', $response[0]['type']);
-        $this->assertEquals('brouillon', $response[3]['type']);
+        $this->assertEquals('brouillon', $response[4]['type']);
     }
 
 

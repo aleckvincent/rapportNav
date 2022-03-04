@@ -222,9 +222,14 @@ class RapportService {
     {
         $drafts = $this->em->getRepository(PamDraft::class)->findAll();
         $rapports = $this->em->getRepository(PamRapport::class)->findAll();
-        $idsRapport = [];
-        $results = [];
 
+        return $this->handleRapportAndDraft($rapports, $drafts);
+    }
+
+    public function handleRapportAndDraft(array $rapports, array $drafts): array
+    {
+        $results = [];
+        $idsRapport = [];
         foreach($rapports as $rapport) {
             $results[] = $rapport;
             $idsRapport[] = $rapport->getId();

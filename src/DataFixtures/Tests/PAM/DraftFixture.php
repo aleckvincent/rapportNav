@@ -11,11 +11,13 @@ use App\Entity\PAM\PamEquipage;
 use App\Entity\PAM\PamEquipageAgent;
 use App\Entity\PAM\PamIndicateur;
 use App\Entity\PAM\PamMission;
+use App\Entity\PAM\PamRapportId;
 use App\Entity\Service;
 use App\Request\PAM\DraftRequest;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class DraftFixture extends Fixture implements FixtureGroupInterface {
@@ -32,13 +34,30 @@ class DraftFixture extends Fixture implements FixtureGroupInterface {
 
     public function load(ObjectManager $manager)
     {
-        $draft1 = new PamDraft();
-        $draft2 = new PamDraft();
-        $current = new \DateTime();
+        $twoMonthsAgo = new \DateTime('-2 months');
+        $oneMonthAgo = new \DateTime('-1 month');
+
+        $this->generate($manager, $twoMonthsAgo, 4);
+        $this->generate($manager, $oneMonthAgo, 5);
+
+        $manager->flush();
+    }
+
+
+    /**
+     * @param ObjectManager $manager
+     * @param \DateTime     $startDateTime
+     *
+     * @return void
+     */
+    private function generate(ObjectManager $manager, \DateTime $startDateTime, int $keyID)
+    {
+        $id = 'MED-' . $startDateTime->format('Y') . '-' . $keyID;
+        $draft = new PamDraft();
         $service = $manager->getRepository(Service::class)->findOneBy(['nom' => 'PAM_test']);
 
         $body = new DraftRequest();
-        $body->setStartDatetime($current);
+        $body->setStartDatetime($startDateTime);
         $body->setNbJoursMer(14);
         $body->setMouillage(1);
 
@@ -46,7 +65,7 @@ class DraftFixture extends Fixture implements FixtureGroupInterface {
         $agent->setNom('Doe');
         $agent->setPrenom('John');
         $agent->setService($service);
-        $agent->setDateArrivee(new \DateTimeImmutable());
+        $agent->setDateArrivee(\DateTimeImmutable::createFromMutable($startDateTime));
 
         $fonction = new FonctionAgent();
         $fonction->setNom('Agent de test');
@@ -74,23 +93,18 @@ class DraftFixture extends Fixture implements FixtureGroupInterface {
         }
 
         $body->addMission($mission);
-
+        $body->setStartDatetime($startDateTime);
         $json = $this->serializer->serialize($body, 'json', ['groups' => 'draft']);
 
-        $draft1->setBody($json);
-        $draft1->setNumber('MED-' . $current->format('Y') . '-1');
-        $draft1->setStartDatetime($current);
-        $draft1->setCreatedBy($service);
+        $draft->setBody($json);
+        $draft->setNumber($id);
+        $draft->setStartDatetime($startDateTime);
+        $draft->setCreatedBy($service);
 
-        $body->setStartDatetime(new \DateTime('+28 days'));
-        $draft2->setBody($json);
-        $draft2->setNumber('MED-' . $current->format('Y') . '-4');
-        $draft2->setStartDatetime(new \DateTime('+28 days'));
-        $draft2->setCreatedBy($service);
+        $rapportID = new PamRapportId();
+        $rapportID->setId($id);
 
-        $manager->persist($draft1);
-        $manager->persist($draft2);
-
-        $manager->flush();
+        $manager->persist($draft);
+        $manager->persist($rapportID);
     }
 }
