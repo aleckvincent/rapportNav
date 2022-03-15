@@ -92,9 +92,9 @@ class PamDraftRepository extends ServiceEntityRepository
 
         $rapports = [];
         foreach($results as $result) {
-            $rapports[] = $this->serializer->deserialize($result->getBody(), DraftRequest::class, 'json');
+            $rapports[] = json_decode($result->getBody(), true);
         }
 
-        return $rapports;
+        return $results;
     }
 }

@@ -36,6 +36,21 @@ class OfficeFiller {
         }
     }
 
+    public function fillCellsArray(Worksheet $sheet, int $startRow, array $indicateurs): void
+    {
+        foreach($indicateurs as $key => $value) {
+            $row = ($startRow + $key);
+            $cellTitle = self::INDICATEUR_CATEGORY_TITLE_COL . $row;
+            $cellPrincipale = self::INDICATEUR_PRINCIPALE_COL . $row;
+            $cellSecondaire = self::INDICATEUR_SECONDAIRE_COL . $row;
+            $cellObservation = self::INDICATEUR_OBSERVATION_COL . $row;
+            $sheet->setCellValue($cellTitle, $value['category']['nom']);
+            $sheet->setCellValue($cellPrincipale, $value['principale']);
+            $sheet->setCellValue($cellSecondaire, $value['secondaire']);
+            $sheet->setCellValue($cellObservation, $value['observations']);
+        }
+    }
+
     /**
      * @param PamControle[] $controles
      * @param Table         $table

@@ -3,6 +3,7 @@
 namespace App\Service\PAM;
 setlocale (LC_TIME, 'fr_FR.utf8','fra');
 
+use App\Entity\PAM\PamDraft;
 use App\Exception\RapportNotFound;
 use App\Repository\PAM\PamDraftRepository;
 use App\Repository\PAM\PamIndicateurRepository;
@@ -101,43 +102,51 @@ class ExportService {
             throw new RapportNotFound('Aucun rapport trouvé pour cette unité');
         }
         foreach($rapports as $key => $rapport) {
-            $sheet = clone $spreadsheet->getSheet(0);
-            $sheet->setTitle($rapport->getStartDatetime()->format('F Y'));
-            $spreadsheet->addSheet($sheet, $key);
-            foreach($rapport->getMissions() as $mission) {
-                switch($mission->getCategory()->getId()) {
-                    case 1:
-                        $assistanceNavire = $mission->getIndicateurs()->toArray();
-                        break;
-                    case 2:
-                        $lutteImmigrationIllegale = $mission->getIndicateurs()->toArray();
-                        break;
-                    case 3:
-                        $repressionPollution = $mission->getIndicateurs()->toArray();
-                        break;
-                    case 4:
-                        $pecheIllegale = $mission->getIndicateurs()->toArray();
-                        break;
-                    case 5:
-                        $surveillanceEnv = $mission->getIndicateurs()->toArray();
-                        break;
-                    case 6:
-                        $sureteMaritime = $mission->getIndicateurs()->toArray();
-                        break;
-                    case 7:
-                        $interetsNationaux = $mission->getIndicateurs()->toArray();
-                        break;
+
+            if($rapport->getType() === 'brouillon') {
+                $this->exportAEMArray($spreadsheet, $rapport, $key);
+            } else {
+                $sheet = clone $spreadsheet->getSheet(0);
+                $sheet->setTitle($rapport->getStartDatetime()->format('F Y'));
+                $spreadsheet->addSheet($sheet, $key);
+                foreach($rapport->getMissions() as $mission) {
+                    switch($mission->getCategory()->getId()) {
+                        case 1:
+                            $assistanceNavire = $mission->getIndicateurs()->toArray();
+                            break;
+                        case 2:
+                            $lutteImmigrationIllegale = $mission->getIndicateurs()->toArray();
+                            break;
+                        case 3:
+                            $repressionPollution = $mission->getIndicateurs()->toArray();
+                            break;
+                        case 4:
+                            $pecheIllegale = $mission->getIndicateurs()->toArray();
+                            break;
+                        case 5:
+                            $surveillanceEnv = $mission->getIndicateurs()->toArray();
+                            break;
+                        case 6:
+                            $sureteMaritime = $mission->getIndicateurs()->toArray();
+                            break;
+                        case 7:
+                            $interetsNationaux = $mission->getIndicateurs()->toArray();
+                            break;
+                    }
                 }
+
+                $filler->fillCells($sheet, self::ROW_ASSISTANCE_NAVIRE, $assistanceNavire);
+                $filler->fillCells($sheet, self::ROW_INTERETS_NATIONAUX, $interetsNationaux);
+                $filler->fillCells($sheet, self::ROW_LUTTE_IMMIGRATION_ILLEGALE, $lutteImmigrationIllegale);
+                $filler->fillCells($sheet, self::ROW_REPRESSION_POLLUTION, $repressionPollution);
+                $filler->fillCells($sheet, self::ROW_PECHE_ILLEGALE, $pecheIllegale);
+                $filler->fillCells($sheet, self::ROW_SURVEILLANCE_ENVIRONNEMENT, $surveillanceEnv);
+                $filler->fillCells($sheet, self::ROW_SURETE_MARITIME, $sureteMaritime);
+                $sheet->setCellValue('B9', $rapport->getCreatedBy()->getNom());
             }
 
-            $filler->fillCells($sheet, self::ROW_ASSISTANCE_NAVIRE, $assistanceNavire);
-            $filler->fillCells($sheet, self::ROW_INTERETS_NATIONAUX, $interetsNationaux);
-            $filler->fillCells($sheet, self::ROW_LUTTE_IMMIGRATION_ILLEGALE, $lutteImmigrationIllegale);
-            $filler->fillCells($sheet, self::ROW_REPRESSION_POLLUTION, $repressionPollution);
-            $filler->fillCells($sheet, self::ROW_PECHE_ILLEGALE, $pecheIllegale);
-            $filler->fillCells($sheet, self::ROW_SURVEILLANCE_ENVIRONNEMENT, $surveillanceEnv);
-            $filler->fillCells($sheet, self::ROW_SURETE_MARITIME, $sureteMaritime);
-            $sheet->setCellValue('B9', $rapport->getCreatedBy()->getNom());
+
+
         }
 
         $sheetIndex = $spreadsheet->getIndex(
@@ -298,5 +307,55 @@ class ExportService {
         $filler->fillCells($sheet, self::ROW_PECHE_ILLEGALE, $pecheIllegale);
         $filler->fillCells($sheet, self::ROW_SURVEILLANCE_ENVIRONNEMENT, $surveillanceEnv);
         $filler->fillCells($sheet, self::ROW_SURETE_MARITIME, $sureteMaritime);
+    }
+
+    private function exportAEMArray(Spreadsheet $spreadsheet, $draft, int $key)
+    {
+        $assistanceNavire = [];
+        $lutteImmigrationIllegale = [];
+        $repressionPollution = [];
+        $pecheIllegale = [];
+        $surveillanceEnv = [];
+        $sureteMaritime = [];
+        $interetsNationaux = [];
+        $rapport = json_decode($draft->getBody(), true);
+        $filler = new OfficeFiller();
+        $sheet = clone $spreadsheet->getSheet(0);
+        $sheet->setTitle($draft->getStartDateTime()->format('F Y'));
+        $spreadsheet->addSheet($sheet, $key);
+        foreach($rapport['missions'] as $mission) {
+            switch($mission['category']['id']) {
+                case 1:
+                    $assistanceNavire = $mission['indicateurs'];
+                    break;
+                case 2:
+                    $lutteImmigrationIllegale = $mission['indicateurs'];
+                    break;
+                case 3:
+                    $repressionPollution = $mission['indicateurs'];
+                    break;
+                case 4:
+                    $pecheIllegale = $mission['indicateurs'];
+                    break;
+                case 5:
+                    $surveillanceEnv = $mission['indicateurs'];
+                    break;
+                case 6:
+                    $sureteMaritime = $mission['indicateurs'];
+                    break;
+                case 7:
+                    $interetsNationaux = $mission['indicateurs'];
+                    break;
+            }
+        }
+
+        $filler->fillCellsArray($sheet, self::ROW_ASSISTANCE_NAVIRE, $assistanceNavire);
+        $filler->fillCellsArray($sheet, self::ROW_INTERETS_NATIONAUX, $interetsNationaux);
+        $filler->fillCellsArray($sheet, self::ROW_LUTTE_IMMIGRATION_ILLEGALE, $lutteImmigrationIllegale);
+        $filler->fillCellsArray($sheet, self::ROW_REPRESSION_POLLUTION, $repressionPollution);
+        $filler->fillCellsArray($sheet, self::ROW_PECHE_ILLEGALE, $pecheIllegale);
+        $filler->fillCellsArray($sheet, self::ROW_SURVEILLANCE_ENVIRONNEMENT, $surveillanceEnv);
+        $filler->fillCellsArray($sheet, self::ROW_SURETE_MARITIME, $sureteMaritime);
+        $sheet->setCellValue('B9', $draft->getCreatedBy()->getNom());
     }
 }
