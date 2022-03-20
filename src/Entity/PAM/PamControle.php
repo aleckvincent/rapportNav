@@ -93,6 +93,21 @@ class PamControle
      */
     private $category;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $assistanceEtSauvetage;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $manifestationNautique;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $lutteAntiPollution;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -241,4 +256,39 @@ class PamControle
 
         return $this;
     }
+
+    public function getAssistanceEtSauvetage() : ?int
+    {
+        return $this->assistanceEtSauvetage;
+    }
+
+    public function setAssistanceEtSauvetage(?int $assistanceEtSauvetage): self
+    {
+        $this->assistanceEtSauvetage = $assistanceEtSauvetage;
+        return $this;
+    }
+
+    public function getManifestationNautique() : ?int
+    {
+        return $this->manifestationNautique;
+    }
+
+    public function setManifestationNautique(?int $manifestationNautique): self
+    {
+        $this->manifestationNautique = $manifestationNautique;
+        return $this;
+    }
+
+    public function getLutteAntiPollution(): ?int
+    {
+        return $this->lutteAntiPollution;
+    }
+
+    public function setLutteAntiPollution(?int $lutteAntiPollution): self
+    {
+        $this->lutteAntiPollution = $lutteAntiPollution;
+        return $this;
+    }
+
+
 }

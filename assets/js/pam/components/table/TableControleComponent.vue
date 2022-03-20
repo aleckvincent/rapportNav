@@ -6,11 +6,18 @@
       <th
           :class="'th-table-controle-' + controleId"
           v-for="(col, counter) in cols"
-          v-if="col.enabled === true"
+          v-if="col.enabled === true && controleId !== 5"
       >
         {{col.title}}
       </th>
-      <th class="add-column dropbtn" :id="'add-btn_' + controleId" @click="dropdownHidden = false" ref="tooltip">
+      <th
+          :class="'th-table-controle-' + controleId"
+          v-for="(col, counter) in cols"
+          v-if="controleId === 5 && col.other"
+      >
+        {{col.title}}
+      </th>
+      <th class="add-column dropbtn" :id="'add-btn_' + controleId" @click="dropdownHidden = false" ref="tooltip" v-if="controleId !== 5">
         <div class="add-column-label" >
           <i class="ri-add-circle-fill add-icon" aria-hidden="true" />
           <span class="icon-text">Ajouter un PV, nav déroutés...</span>
@@ -19,6 +26,7 @@
       </thead>
 
       <tbody :class="'tbody-controle tbody-controle-' + id" >
+      {{controleId}}
       <tr class="tr-table" v-for="(pavillon, index) in pavillons">
         <td class="td-pavillon td-table-controle">
           <select name="pavillon" :id="'pavillon-select_' + id" class="fr-select fr-select-custom" v-model="pavillon.pavillon">
@@ -33,68 +41,89 @@
         </td>
         <TdEditable
             id="nb_navire_controle"
-            v-if="cols[0].enabled"
+            v-if="cols[0].enabled && controleId !== 5"
             v-model="pavillon.nb_navire_controle"
             :value="pavillon.nb_navire_controle"
         >
         </TdEditable>
         <TdEditable
             id="nb_pv_peche_sanitaire"
-            v-if="cols[1].enabled || pavillon.nb_pv_peche_sanitaire > 0"
+            v-if="cols[1].enabled && controleId !== 5"
             v-model="pavillon.nb_pv_peche_sanitaire"
             :value="pavillon.nb_pv_peche_sanitaire"
         >
         </TdEditable>
         <TdEditable
             id="nb_pv_equipement_securite"
-            v-if="cols[2].enabled"
+            v-if="cols[2].enabled && controleId !== 5"
             v-model="pavillon.nb_pv_equipement_securite"
             :value="pavillon.nb_pv_equipement_securite"
         >
         </TdEditable>
         <TdEditable
             id="nb_pv_titre_nav"
-            v-if="cols[3].enabled"
+            v-if="cols[3].enabled && controleId !== 5"
             v-model="pavillon.nb_pv_titre_nav"
             :value="pavillon.nb_pv_titre_nav"
         >
         </TdEditable>
         <TdEditable
             id="nb_pv_police"
-            v-if="cols[4].enabled"
+            v-if="cols[4].enabled && controleId !== 5"
             v-model="pavillon.nb_pv_police"
             :value="pavillon.nb_pv_police"
         >
         </TdEditable>
         <TdEditable
             id="nb_pv_env_pollution"
-            v-if="cols[5].enabled"
+            v-if="cols[5].enabled && controleId !== 5"
             v-model="pavillon.nb_pv_env_pollution"
             :value="pavillon.nb_pv_env_pollution"
         >
         </TdEditable>
         <TdEditable
             id="nb_autre_pv"
-            v-if="cols[6].enabled"
+            v-if="cols[6].enabled && controleId !== 5"
             v-model="pavillon.nb_autre_pv"
             :value="pavillon.nb_autre_pv"
         >
         </TdEditable>
         <TdEditable
             id="nb_nav_deroute"
-            v-if="cols[7].enabled"
+            v-if="cols[7].enabled && controleId !== 5"
             v-model="pavillon.nb_nav_deroute"
             :value="pavillon.nb_nav_deroute"
         >
         </TdEditable>
         <TdEditable
             id="nb_nav_interroge"
-            v-if="cols[8].enabled"
+            v-if="cols[8].enabled && controleId !== 5"
             v-model="pavillon.nb_nav_interroge"
             :value="pavillon.nb_nav_interroge"
         >
         </TdEditable>
-        <td class="td-add-column td-table-controle" :id="'add_column_' + id"></td>
+        <TdEditable
+            id="asssistance_sauvetage"
+            v-if="controleId === 5"
+            v-model="pavillon.assistanceEtSauvetage"
+            :value="pavillon.assistanceEtSauvetage"
+        >
+        </TdEditable>
+        <TdEditable
+            id="manifestation_nautique"
+            v-if="controleId === 5"
+            v-model="pavillon.manifestationNautique"
+            :value="pavillon.manifestationNautique"
+        >
+        </TdEditable>
+        <TdEditable
+            id="lutte_pollution"
+            v-if="controleId === 5"
+            v-model="pavillon.lutteAntiPollution"
+            :value="pavillon.lutteAntiPollution"
+        >
+        </TdEditable>
+        <td class="td-add-column td-table-controle" :id="'add_column_' + id" v-if="controleId !== 5"></td>
       </tr>
       <tr class="total-control">
         <th scope="row" class="th-foot-controle">Total</th>
@@ -109,7 +138,7 @@
       </tr>
       </tfoot>
     </table>
-    <div class="add-pavillon" v-on:click="addPav($event)" :id="'ajout_pavillon_' + id">
+    <div class="add-pavillon" v-on:click="addPav($event)" :id="'ajout_pavillon_' + id" v-if="controleId !== 5" >
       <i class="ri-add-circle-fill add-icon" aria-hidden="true" />
       <span class="icon-text">Ajouter un pavillon</span>
     </div>
@@ -156,32 +185,34 @@ export default {
   },
   mounted() {
     this.pavillons.forEach((pavillon, index) => {
-      if(pavillon.nb_navire_controle) {
-        this.cols[0].enabled = true
-      }
-      if(pavillon.nb_pv_peche_sanitaire) {
-        this.cols[1].enabled = true;
-      }
-      if(pavillon.nb_pv_equipement_securite) {
-        this.cols[2].enabled = true
-      }
-      if(pavillon.nb_pv_titre_nav) {
-        this.cols[3].enabled = true
-      }
-      if(pavillon.nb_pv_police) {
-        this.cols[4].enabled = true
-      }
-      if(pavillon.nb_pv_env_pollution) {
-        this.cols[5].enabled = true
-      }
-      if(pavillon.nb_autre_pv) {
-        this.cols[6].enabled = true
-      }
-      if(pavillon.nb_nav_deroute) {
-        this.cols[7].enabled = true
-      }
-      if(pavillon.nb_nav_interroge) {
-        this.cols[8].enabled = true
+      if(this.controleId !== 5) {
+        if(pavillon.nb_navire_controle) {
+          this.cols[0].enabled = true
+        }
+        if(pavillon.nb_pv_peche_sanitaire) {
+          this.cols[1].enabled = true;
+        }
+        if(pavillon.nb_pv_equipement_securite) {
+          this.cols[2].enabled = true
+        }
+        if(pavillon.nb_pv_titre_nav) {
+          this.cols[3].enabled = true
+        }
+        if(pavillon.nb_pv_police) {
+          this.cols[4].enabled = true
+        }
+        if(pavillon.nb_pv_env_pollution) {
+          this.cols[5].enabled = true
+        }
+        if(pavillon.nb_autre_pv) {
+          this.cols[6].enabled = true
+        }
+        if(pavillon.nb_nav_deroute) {
+          this.cols[7].enabled = true
+        }
+        if(pavillon.nb_nav_interroge) {
+          this.cols[8].enabled = true
+        }
       }
     })
   },
@@ -298,6 +329,21 @@ export default {
           title: 'Navire interrogé',
           enabled: false
         },
+        {
+          title: 'Assitance de navire',
+          enabled: false,
+          other: true
+        },
+        {
+          title: 'Manifestation nautique',
+          enabled: false,
+          other: true
+        },
+        {
+          title: 'Lutte anti pollution',
+          enabled: false,
+          other: true
+        }
       ],
       dropdownHidden: true
     }
