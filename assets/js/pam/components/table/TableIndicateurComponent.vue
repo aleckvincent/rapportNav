@@ -14,9 +14,16 @@
         <th class="td-nb-hour-sea td-indicateur th-tr-indicateur" scope="row" >
           {{ mission.category.nom }}
         </th>
-        <TdEditable class-list="td-indicateur td-fillable" :value="mission.principale" @change="setValue(mission, $event, 'principale', index)"></TdEditable>
-        <TdEditable class-list="td-indicateur td-fillable" :value="mission.secondaire" @change="setValue(mission, $event, 'secondaire', index)"></TdEditable>
-        <TdEditable class-list="td-indicateur td-total" :value="mission.total" total></TdEditable>
+        <TdEditable @mouseover="i = true" class-list="td-indicateur td-fillable" :value="mission.principale" @change="setValue(mission, $event, 'principale', index)" />
+        <div class="tooltip-automatic-calculate">
+          <div class="fr-toggle fr-toggle--label-left">
+            <input type="checkbox" class="fr-toggle__input" aria-describedby="toggle-726-hint-text" id="toggle-726">
+            <label class="fr-toggle__label" for="toggle-726">Calculé automatiquement à partir des déclarations opérationnelles</label>
+            <p class="fr-hint-text" id="toggle-726-hint-text">Calculé automatiquement à partir des déclarations opérationnelles</p>
+          </div>
+        </div>
+        <TdEditable class-list="td-indicateur td-fillable" :value="mission.secondaire" @change="setValue(mission, $event, 'secondaire', index)" />
+        <TdEditable class-list="td-indicateur td-total" :value="mission.total" total />
         <TdEditable v-model="mission.observations" observation></TdEditable>
       </tr>
       </tbody>
@@ -64,6 +71,7 @@ export default {
   },
   data() {
     return {
+      i: false
     }
   }
 }
