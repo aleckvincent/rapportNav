@@ -26,7 +26,6 @@
       </thead>
 
       <tbody :class="'tbody-controle tbody-controle-' + id" >
-      {{controleId}}
       <tr class="tr-table" v-for="(pavillon, index) in pavillons">
         <td class="td-pavillon td-table-controle">
           <select name="pavillon" :id="'pavillon-select_' + id" class="fr-select fr-select-custom" v-model="pavillon.pavillon">
