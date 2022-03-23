@@ -273,10 +273,6 @@ export default {
     },
     getAutresMission(value) {
       this.rapport.autreMission = value;
-      const indicateurMissionComponent = this.$refs.indicateurMission
-      const accordion = indicateurMissionComponent.$refs.accordionIndicateurMission;
-      
-    //  tableIndicateur.setAutomaticValue();
     }
   },
   data() {

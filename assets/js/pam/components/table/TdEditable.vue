@@ -47,7 +47,8 @@ export default {
      type: String,
     default: null
   },
-    total: Boolean
+    total: Boolean,
+    indicateur: Boolean
   },
   mounted() {
     this.val = this.value;
@@ -76,6 +77,13 @@ export default {
     hideTooltip(event) {
       if(!this.$refs.observation.contains(event.target)) {
         this.hidden = true;
+      }
+    }
+  },
+  watch: {
+    value: function(newValue, oldValue) {
+      if(this.indicateur) {
+        this.val = newValue;
       }
     }
   },

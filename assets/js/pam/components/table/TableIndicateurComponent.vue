@@ -14,7 +14,7 @@
         <th class="td-nb-hour-sea td-indicateur th-tr-indicateur" scope="row" >
           {{ indicateur.category.nom }}
         </th>
-        <TdEditable class-list="td-indicateur td-fillable" :value="indicateur.principale" @change="setValue(indicateur, $event, 'principale', index)" />
+        <TdEditable class-list="td-indicateur td-fillable" :value="indicateur.principale" @change="setValue(indicateur, $event, 'principale', index)" indicateur />
     <!--    <div class="tooltip-automatic-calculate">
           <div class="fr-toggle fr-toggle--label-left">
             <input type="checkbox" class="fr-toggle__input" aria-describedby="toggle-726-hint-text" id="toggle-726">
@@ -22,7 +22,7 @@
             <p class="fr-hint-text" id="toggle-726-hint-text">Calculé automatiquement à partir des déclarations opérationnelles</p>
           </div>
         </div>-->
-        <TdEditable class-list="td-indicateur td-fillable" :value="indicateur.secondaire" @change="setValue(indicateur, $event, 'secondaire', index)" />
+        <TdEditable class-list="td-indicateur td-fillable" :value="indicateur.secondaire" @change="setValue(indicateur, $event, 'secondaire', index)" indicateur />
         <TdEditable class-list="td-indicateur td-total" :value="indicateur.total" total />
         <TdEditable v-model="indicateur.observations" observation></TdEditable>
       </tr>
@@ -40,9 +40,6 @@ export default {
     autreMission: Object,
     mission: Object
   },
-  mounted() {
-    this.setAutomaticValue();
-  },
   methods: {
     hiddenToggle(className, scope) {
       let tooltip = $('.' + className + '[data-scope="' + scope + '"]');
@@ -53,30 +50,67 @@ export default {
       messageBox.toggleClass('d-none')
     },
     setValue(indicateur, value, scope, index) {
-      console.log(value);
       if(scope === 'principale') {
         indicateur.principale = value;
       } else {
         indicateur.secondaire = value;
       }
-
       this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
-    },
-    setAutomaticValue() {
-
-    },
+    }
   },
   watch: {
-    'autreMission.nbAssistanceSauvetage': function(newVal, old) {
+    'autreMission.nbAssistanceSauvetage': function(value) {
       if(this.mission.category.nom === 'Assistance aux navires en difficulté et sécurité maritime') {
         this.indicateurs.filter((indicateur, index) => {
           if(indicateur.category.nom === 'Nombre d\'opérations suivies (ayant fait l\'objet d\'un DEFREP)') {
-            if(this.mission.checked) {
-              indicateur.principale = newVal;
+            if(this.mission.is_main) {
+              indicateur.principale = value;
             } else {
-              indicateur.secondaire = newVal;
+              indicateur.secondaire = value;
             }
-
+            this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+          }
+        })
+      }
+    },
+    'autreMission.dureeAssistanceSauvetage': function(value) {
+      if(this.mission.category.nom === 'Assistance aux navires en difficulté et sécurité maritime') {
+        this.indicateurs.filter((indicateur, index) => {
+          if(indicateur.category.nom === 'Nombre d\'heures de mer') {
+            if(this.mission.is_main) {
+              indicateur.principale = value;
+            } else {
+              indicateur.secondaire = value;
+            }
+            this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+          }
+        })
+      }
+    },
+    'autreMission.dureeLuttePollution': function(value) {
+      if(this.mission.category.nom === 'Répression contre les rejets illicites, lutte contre les pollutions et protection de l\'environnement') {
+        this.indicateurs.filter((indicateur, index) => {
+          if(indicateur.category.nom === 'Nombre d\'heures de mer (surveillance et lutte)') {
+            if(this.mission.is_main) {
+              indicateur.principale = value;
+            } else {
+              indicateur.secondaire = value;
+            }
+            this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+          }
+        })
+      }
+    },
+    'autreMission.nbLuttePollution': function(value) {
+      if(this.mission.category.nom === 'Répression contre les rejets illicites, lutte contre les pollutions et protection de l\'environnement') {
+        this.indicateurs.filter((indicateur, index) => {
+          if(indicateur.category.nom === 'Nombre d\'opérations de lutte anti-pollution en mer') {
+            if(this.mission.is_main) {
+              indicateur.principale = value;
+            } else {
+              indicateur.secondaire = value;
+            }
+            this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
           }
         })
       }
