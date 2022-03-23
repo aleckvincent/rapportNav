@@ -62,6 +62,7 @@
                 v-if="rapport.missions"
                 :missions="rapport.missions"
                 :autre-mission="rapport.autreMission"
+                :controles="rapport.controles"
             />
           </div>
         </div>

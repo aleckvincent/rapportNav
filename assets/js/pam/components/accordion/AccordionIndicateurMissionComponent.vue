@@ -21,6 +21,7 @@
                 <TableIndicateurComponent
                     :mission="mission"
                     :autre-mission="autreMission"
+                    :controles="controles"
                 ></TableIndicateurComponent>
               </div>
             </section>
@@ -37,7 +38,8 @@ export default {
   name: "AccordionIndicateurMissionComponent",
   props: {
     mission: Object,
-    autreMission: Object
+    autreMission: Object,
+    controles: Array
   },
   components: {
     TableIndicateurComponent

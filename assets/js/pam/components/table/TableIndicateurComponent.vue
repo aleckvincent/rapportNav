@@ -38,7 +38,8 @@ export default {
   components: {TdEditable},
   props: {
     autreMission: Object,
-    mission: Object
+    mission: Object,
+    controles: Array
   },
   methods: {
     hiddenToggle(className, scope) {
@@ -56,6 +57,14 @@ export default {
         indicateur.secondaire = value;
       }
       this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+    },
+    setAutomaticValue(indicateur, value, index) {
+      if(this.mission.is_main) {
+        indicateur.principale = value;
+      } else {
+        indicateur.secondaire = value;
+      }
+      this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
     }
   },
   watch: {
@@ -63,12 +72,7 @@ export default {
       if(this.mission.category.nom === 'Assistance aux navires en difficulté et sécurité maritime') {
         this.indicateurs.filter((indicateur, index) => {
           if(indicateur.category.nom === 'Nombre d\'opérations suivies (ayant fait l\'objet d\'un DEFREP)') {
-            if(this.mission.is_main) {
-              indicateur.principale = value;
-            } else {
-              indicateur.secondaire = value;
-            }
-            this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+            this.setAutomaticValue(indicateur, value, index);
           }
         })
       }
@@ -77,12 +81,7 @@ export default {
       if(this.mission.category.nom === 'Assistance aux navires en difficulté et sécurité maritime') {
         this.indicateurs.filter((indicateur, index) => {
           if(indicateur.category.nom === 'Nombre d\'heures de mer') {
-            if(this.mission.is_main) {
-              indicateur.principale = value;
-            } else {
-              indicateur.secondaire = value;
-            }
-            this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+            this.setAutomaticValue(indicateur, value, index);
           }
         })
       }
@@ -91,12 +90,7 @@ export default {
       if(this.mission.category.nom === 'Répression contre les rejets illicites, lutte contre les pollutions et protection de l\'environnement') {
         this.indicateurs.filter((indicateur, index) => {
           if(indicateur.category.nom === 'Nombre d\'heures de mer (surveillance et lutte)') {
-            if(this.mission.is_main) {
-              indicateur.principale = value;
-            } else {
-              indicateur.secondaire = value;
-            }
-            this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+            this.setAutomaticValue(indicateur, value, index);
           }
         })
       }
@@ -105,12 +99,53 @@ export default {
       if(this.mission.category.nom === 'Répression contre les rejets illicites, lutte contre les pollutions et protection de l\'environnement') {
         this.indicateurs.filter((indicateur, index) => {
           if(indicateur.category.nom === 'Nombre d\'opérations de lutte anti-pollution en mer') {
-            if(this.mission.is_main) {
-              indicateur.principale = value;
-            } else {
-              indicateur.secondaire = value;
-            }
-            this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+            this.setAutomaticValue(indicateur, value, index);
+          }
+        })
+      }
+    },
+    'controles': function(controles) {
+      let envPollution = [];
+      let nbPvPecheSanitaire = [];
+      let nbControlePecheSanitaire = [];
+
+      controles.forEach((controle) => {
+        envPollution.push(controle.nb_pv_env_pollution);
+
+        if(controle.category.nom.includes('en mer')) {
+          nbControlePecheSanitaire.push(controle.nb_controles_peche_sanitaire);
+          nbPvPecheSanitaire.push(controle.nb_pv_peche_sanitaire);
+        }
+      });
+
+      if(this.mission.category.nom === 'Répression contre les rejets illicites, lutte contre les pollutions et protection de l\'environnement') {
+        this.indicateurs.filter((indicateur, index) => {
+          if(indicateur.category.nom === 'Nombre de procès-verbaux d\'infraction dressés') {
+            let total = 0;
+            envPollution.forEach((pv) => {
+              total += pv;
+            })
+            this.setAutomaticValue(indicateur, total, index);
+          }
+        })
+      }
+
+      if(this.mission.category.nom === 'Lutte contre les activités de pêche illégale, gestion du patrimoine marin et des ressources publiques marines') {
+        this.indicateurs.filter((indicateur, index) => {
+          if(indicateur.category.nom === 'Nombre de navires contrôlés en mer (législation pêche)') {
+            let total = 0;
+            nbControlePecheSanitaire.forEach((pv) => {
+              total += pv;
+            })
+            this.setAutomaticValue(indicateur, total, index);
+          }
+
+          if(indicateur.category.nom === 'Nombre de procès-verbaux dressés (législation pêche)') {
+            let total = 0;
+            nbPvPecheSanitaire.forEach((pv) => {
+              total += pv;
+            })
+            this.setAutomaticValue(indicateur, total, index);
           }
         })
       }

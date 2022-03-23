@@ -7,6 +7,7 @@
     <AccordionIndicateurMissionComponent
         :mission="mission"
         :autre-mission="autreMission"
+        :controles="controles"
     ></AccordionIndicateurMissionComponent>
   </div>
 </div>
@@ -19,7 +20,8 @@ export default {
   components: {AccordionIndicateurMissionComponent},
   props: {
     missions: Array,
-    autreMission: Object
+    autreMission: Object,
+    controles: Array
   },
   data() {
     return {
