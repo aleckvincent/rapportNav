@@ -19,8 +19,8 @@
               <div class="fr-collapse" :id="'accordion-indicateurs-' + id ">
                 <div class="divider-horizontal--accordion"></div>
                 <TableIndicateurComponent
-                    :id="id"
-                    :types="indicateurs"
+                    :mission="mission"
+                    :autre-mission="autreMission"
                 ></TableIndicateurComponent>
               </div>
             </section>
@@ -36,22 +36,8 @@ import TableIndicateurComponent from "../table/TableIndicateurComponent";
 export default {
   name: "AccordionIndicateurMissionComponent",
   props: {
-    title: {
-      type: String,
-      default: null
-    },
-    categoryId: {
-      type: Number,
-      default: null
-    },
-    indicateurs: {
-      type: Array,
-      default: null
-    },
-    expanded: {
-      type: String,
-      default: () => { return "false" }
-    }
+    mission: Object,
+    autreMission: Object
   },
   components: {
     TableIndicateurComponent
@@ -59,7 +45,10 @@ export default {
   methods: {},
   data: function() {
     return {
-      id: this.categoryId
+      id: this.mission.category.id,
+      title: this.mission.category.nom,
+      expanded: this.mission.checked ?  'true' : 'false',
+      indicateurs: this.mission.indicateurs
     }
   }
 }

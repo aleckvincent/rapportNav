@@ -10,21 +10,21 @@
       </thead>
 
       <tbody>
-      <tr class="tr-indicateur" v-for="(mission, index) in types">
+      <tr class="tr-indicateur" v-for="(indicateur, index) in indicateurs">
         <th class="td-nb-hour-sea td-indicateur th-tr-indicateur" scope="row" >
-          {{ mission.category.nom }}
+          {{ indicateur.category.nom }}
         </th>
-        <TdEditable @mouseover="i = true" class-list="td-indicateur td-fillable" :value="mission.principale" @change="setValue(mission, $event, 'principale', index)" />
-        <div class="tooltip-automatic-calculate">
+        <TdEditable class-list="td-indicateur td-fillable" :value="indicateur.principale" @change="setValue(indicateur, $event, 'principale', index)" />
+    <!--    <div class="tooltip-automatic-calculate">
           <div class="fr-toggle fr-toggle--label-left">
             <input type="checkbox" class="fr-toggle__input" aria-describedby="toggle-726-hint-text" id="toggle-726">
             <label class="fr-toggle__label" for="toggle-726">Calculé automatiquement à partir des déclarations opérationnelles</label>
             <p class="fr-hint-text" id="toggle-726-hint-text">Calculé automatiquement à partir des déclarations opérationnelles</p>
           </div>
-        </div>
-        <TdEditable class-list="td-indicateur td-fillable" :value="mission.secondaire" @change="setValue(mission, $event, 'secondaire', index)" />
-        <TdEditable class-list="td-indicateur td-total" :value="mission.total" total />
-        <TdEditable v-model="mission.observations" observation></TdEditable>
+        </div>-->
+        <TdEditable class-list="td-indicateur td-fillable" :value="indicateur.secondaire" @change="setValue(indicateur, $event, 'secondaire', index)" />
+        <TdEditable class-list="td-indicateur td-total" :value="indicateur.total" total />
+        <TdEditable v-model="indicateur.observations" observation></TdEditable>
       </tr>
       </tbody>
     </table>
@@ -37,18 +37,11 @@ export default {
   name: "TableIndicateurComponent",
   components: {TdEditable},
   props: {
-    id : {
-      type: Number,
-      default: null
-    },
-    category: {
-      type: Number,
-      default: null
-    },
-    types: {
-      type: Array,
-      default: null
-    }
+    autreMission: Object,
+    mission: Object
+  },
+  mounted() {
+    this.setAutomaticValue();
   },
   methods: {
     hiddenToggle(className, scope) {
@@ -59,19 +52,39 @@ export default {
       let messageBox = $('.hint-text-automatic-calculate[data-scope="' + scope + '"]');
       messageBox.toggleClass('d-none')
     },
-    setValue(mission, value, scope, index) {
+    setValue(indicateur, value, scope, index) {
+      console.log(value);
       if(scope === 'principale') {
-        mission.principale = value;
+        indicateur.principale = value;
       } else {
-        mission.secondaire = value;
+        indicateur.secondaire = value;
       }
-      this.types[index].total = mission.principale + mission.secondaire;
 
+      this.indicateurs[index].total = indicateur.principale + indicateur.secondaire;
+    },
+    setAutomaticValue() {
+
+    },
+  },
+  watch: {
+    'autreMission.nbAssistanceSauvetage': function(newVal, old) {
+      if(this.mission.category.nom === 'Assistance aux navires en difficulté et sécurité maritime') {
+        this.indicateurs.filter((indicateur, index) => {
+          if(indicateur.category.nom === 'Nombre d\'opérations suivies (ayant fait l\'objet d\'un DEFREP)') {
+            if(this.mission.checked) {
+              indicateur.principale = newVal;
+            } else {
+              indicateur.secondaire = newVal;
+            }
+
+          }
+        })
+      }
     }
   },
   data() {
     return {
-      i: false
+      indicateurs: this.mission.indicateurs
     }
   }
 }

@@ -60,9 +60,9 @@
             <!-- Indicateurs de mission-->
             <IndicateurMissionComponent
                 v-if="rapport.missions"
-              :missions="rapport.missions"
-            >
-            </IndicateurMissionComponent>
+                :missions="rapport.missions"
+                :autre-mission="rapport.autreMission"
+            />
           </div>
         </div>
 
@@ -273,6 +273,10 @@ export default {
     },
     getAutresMission(value) {
       this.rapport.autreMission = value;
+      const indicateurMissionComponent = this.$refs.indicateurMission
+      const accordion = indicateurMissionComponent.$refs.accordionIndicateurMission;
+      
+    //  tableIndicateur.setAutomaticValue();
     }
   },
   data() {

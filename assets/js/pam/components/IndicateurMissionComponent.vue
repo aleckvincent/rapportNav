@@ -5,10 +5,8 @@
   </div>
   <div v-for="mission in missions">
     <AccordionIndicateurMissionComponent
-        :title="mission.category.nom"
-        :indicateurs="mission.indicateurs"
-        :expanded="mission.checked ? 'true' : 'false'"
-        :category-id="mission.category.id"
+        :mission="mission"
+        :autre-mission="autreMission"
     ></AccordionIndicateurMissionComponent>
   </div>
 </div>
@@ -20,7 +18,8 @@ export default {
   name: "IndicateurMissionComponent",
   components: {AccordionIndicateurMissionComponent},
   props: {
-    missions: Array
+    missions: Array,
+    autreMission: Object
   },
   data() {
     return {
