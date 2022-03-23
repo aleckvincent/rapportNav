@@ -115,34 +115,24 @@ export default {
   methods: {
     onClickModal(nom, id) {
       let controle = {};
-      if(id === 5) {
-         controle = {
-          category: {
-            id: id,
-            nom: nom
-          },
-          assistanceEtSauvetage: 0,
-          manifestationNautique: 0,
-          lutteAntiPollution: 0
-        }
-      } else {
-         controle = {
-          category: {
-            id: id,
-            nom: nom
-          },
-          pavillon: 'FR',
-          nb_navire_controle: 0,
-          nb_pv_peche_sanitaire: 0,
-          nb_pv_equipement_securite: 0,
-          nb_pv_titre_nav: 0,
-          nb_pv_police: 0,
-          nb_pv_env_pollution: 0,
-          nb_autre_pv: 0,
-          nb_nav_deroute: 0,
-          nb_nav_interroge: 0
-        }
+       controle = {
+        category: {
+          id: id,
+          nom: nom
+        },
+        pavillon: 'FR',
+        nb_navire_controle: 0,
+        nb_pv_peche_sanitaire: 0,
+        nb_controles_peche_sanitaire: 0,
+        nb_pv_equipement_securite: 0,
+        nb_pv_titre_nav: 0,
+        nb_pv_police: 0,
+        nb_pv_env_pollution: 0,
+        nb_autre_pv: 0,
+        nb_nav_deroute: 0,
+        nb_nav_interroge: 0
       }
+
 
       let newType = {
         id: id,
