@@ -153,6 +153,16 @@
           "total": null,
           "observation": null,
           "category": {
+            "id": 8,
+            "nom": "Nombre d'heures de mer (surveillance et lutte)"
+          }
+        },
+        {
+          "principale": null,
+          "secondaire": null,
+          "total": null,
+          "observation": null,
+          "category": {
             "id": 9,
             "nom": "Nombre de pollutions détectées et/ou constatées par un agent habilité"
           }
