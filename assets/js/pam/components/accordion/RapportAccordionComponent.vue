@@ -122,6 +122,7 @@ export default {
         },
         pavillon: 'FR',
         nb_navire_controle: 0,
+        nb_controles_peche_sanitaire: 0,
         nb_pv_peche_sanitaire: 0,
         nb_controles_peche_sanitaire: 0,
         nb_pv_equipement_securite: 0,
