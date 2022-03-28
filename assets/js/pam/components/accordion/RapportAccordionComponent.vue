@@ -130,6 +130,7 @@ export default {
         nb_pv_env_pollution: 0,
         nb_autre_pv: 0,
         nb_nav_deroute: 0,
+        nb_nav_deroute_env_pollution: 0,
         nb_nav_interroge: 0
       }
 
