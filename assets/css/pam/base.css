@@ -815,10 +815,6 @@ td:first-child {
     .informations, .num-report {
        display: none;
     }
-
-    .quitter-btn {
-        display: none;
-    }
 }
 
 @media (min-width: 1441px) {
