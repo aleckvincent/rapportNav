@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends AbstractController {
 
     /**
-     * @Route("/{vueRouting}", name="pam_rapport_dashboard", methods={"GET"}, requirements={"vueRouting"=".*"})
+     * @Route("/test/{vueRouting}", name="pam_rapport_dashboard", methods={"GET"}, requirements={"vueRouting"=".*"})
      */
     public function dashboard()
     {
